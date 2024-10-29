@@ -1,2 +1,2 @@
-# lite-ssdp
-lite ssdp
+# hnet
+home net
