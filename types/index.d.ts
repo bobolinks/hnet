@@ -98,13 +98,19 @@ declare type HnetResponse = HnetFrom & {
   err?: string;
 };
 
+declare type HnetChnnID = number;
+declare interface HnetChannel {
+  id: HnetChnnID;
+  name: string;
+}
+
 declare type HnetCommandMap = {
   search: {
     req: HnetFrom & { type: HnetPointType | '*'; };
     rsp: HnetResponse;
   },
   alive: {
-    req: HnetFrom;
+    req: HnetFrom & { channels: HnetChannel[]; };
     rsp: undefined;
   },
   bye: {
@@ -112,7 +118,10 @@ declare type HnetCommandMap = {
     rsp: undefined;
   },
   data: {
-    req: HnetFrom & { data: string | Uint8Array; };
+    req: HnetFrom & {
+      chnn: HnetChnnID;
+      data: string | Uint8Array;
+    };
     rsp: undefined;
   },
 };
@@ -150,6 +159,13 @@ export declare class HnetSpot extends EventEmitter<HnetEventMap> {
 
   /** stop */
   stop(): void;
+
+  /** for channel */
+  addChannel(channel: HnetChannel): boolean;
+  removeChannel(id: HnetChnnID): void;
+
+  /** send message through data socket */
+  send(message: HnetMessage<any, any>, target: Pick<HnetAddress, 'host' | 'port'>): void;
 
   /** search points with type */
   search(type?: HnetPointType | '*'): void;

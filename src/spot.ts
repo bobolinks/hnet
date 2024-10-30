@@ -3,7 +3,7 @@ import { HNET_BROADCAST_PORT, HNET_DATA_PORT } from './const';
 import { EventEmitter } from './events';
 import { HnetMessage, randomHex } from './message';
 import codec from './codec';
-import type { HnetAddress, HnetCommandMap, HnetEventMap, HnetFrom, HnetPointType, HnetResponse, Logger, Options, PUID, RemoteAddressInfo, UDPSocket } from '../types';
+import type { HnetAddress, HnetChannel, HnetChnnID, HnetCommandMap, HnetEventMap, HnetPointType, HnetResponse, Logger, Options, PUID, RemoteAddressInfo, UDPSocket } from '../types';
 
 function genUUID() {
   return `${randomHex(8)}-${randomHex(4)}-${randomHex(4)}-${randomHex(4)}-${randomHex(12)}`;
@@ -27,6 +27,8 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
 
   /** broadcast port, default 1901 */
   protected readonly sigport: number;
+
+  protected readonly channels: HnetChannel[] = [];
 
   constructor(public readonly sigso: UDPSocket, public readonly datso: UDPSocket, opts?: Partial<Options>, sigport?: number, protected readonly logger?: Logger) {
     super();
@@ -84,6 +86,28 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
     }
   }
 
+  addChannel(channel: HnetChannel): boolean {
+    if (this.channels.find(e => e.id === channel.id)) {
+      if (this.logger) {
+        this.logger.warn(`Channel[${channel.id}] exists!`);
+      }
+      return false;
+    }
+    this.channels.push(channel);
+
+    this.advertise(true);
+
+    return true;
+  }
+
+  removeChannel(id: HnetChnnID): void {
+    const index = this.channels.findIndex(e => e.id === id);
+    if (index !== -1) {
+      this.channels.splice(index, 1);
+      this.advertise(true);
+    }
+  }
+
   send(message: HnetMessage<any, any>, target: Pick<HnetAddress, 'host' | 'port'>) {
     const buf = message.toBuffer();
 
@@ -102,10 +126,13 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
   }
 
   private advertise(alive?: boolean) {
-    const from: HnetFrom = {
+    const req: HnetCommandMap['alive']['req'] | HnetCommandMap['bye']['req'] = {
       from: { host: '', ...this.options }
     };
-    const msg = new HnetMessage<'alive' | 'bye'>(alive ? 'alive' : 'bye', from);
+    if (alive) {
+      (req as any as HnetCommandMap['alive']['req']).channels = this.channels;
+    }
+    const msg = new HnetMessage<'alive' | 'bye'>(alive ? 'alive' : 'bye', req);
 
     this.broadcast(msg);
   }
@@ -142,6 +169,9 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
   private parseCommand(msg: HnetMessage<'alive' | 'bye' | 'search'>, rinfo: RemoteAddressInfo) {
     switch (msg.type) {
       case 'alive': {
+        if (msg.fields.from.type !== 'host') {
+          return;
+        }
         const host: HnetHost = { ...msg.fields.from, host: rinfo.address, active: Date.now() };
         this.hosts[host.uuid] = host;
         this.emit('alive', msg.fields);
@@ -150,6 +180,9 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
         }
       } break;
       case 'bye': {
+        if (msg.fields.from.type !== 'host') {
+          return;
+        }
         delete this.hosts[msg.fields.from.uuid];
         this.emit('bye', msg.fields);
         if (this.logger) {

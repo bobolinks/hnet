@@ -379,6 +379,7 @@ class HnetSpot extends EventEmitter {
     adTimer;
     /** broadcast port, default 1901 */
     sigport;
+    channels = [];
     constructor(sigso, datso, opts, sigport, logger) {
         super();
         this.sigso = sigso;
@@ -436,6 +437,24 @@ class HnetSpot extends EventEmitter {
             this.logger.info(`Spot[${this.options.name}] stoped`);
         }
     }
+    addChannel(channel) {
+        if (this.channels.find(e => e.id === channel.id)) {
+            if (this.logger) {
+                this.logger.warn(`Channel[${channel.id}] exists!`);
+            }
+            return false;
+        }
+        this.channels.push(channel);
+        this.advertise(true);
+        return true;
+    }
+    removeChannel(id) {
+        const index = this.channels.findIndex(e => e.id === id);
+        if (index !== -1) {
+            this.channels.splice(index, 1);
+            this.advertise(true);
+        }
+    }
     send(message, target) {
         const buf = message.toBuffer();
         this.datso.send(buf, 0, buf.length, { address: target.host, port: target.port });
@@ -450,10 +469,13 @@ class HnetSpot extends EventEmitter {
         this.broadcast(msg);
     }
     advertise(alive) {
-        const from = {
+        const req = {
             from: { host: '', ...this.options }
         };
-        const msg = new HnetMessage(alive ? 'alive' : 'bye', from);
+        if (alive) {
+            req.channels = this.channels;
+        }
+        const msg = new HnetMessage(alive ? 'alive' : 'bye', req);
         this.broadcast(msg);
     }
     /**
@@ -486,6 +508,9 @@ class HnetSpot extends EventEmitter {
         switch (msg.type) {
             case 'alive':
                 {
+                    if (msg.fields.from.type !== 'host') {
+                        return;
+                    }
                     const host = { ...msg.fields.from, host: rinfo.address, active: Date.now() };
                     this.hosts[host.uuid] = host;
                     this.emit('alive', msg.fields);
@@ -496,6 +521,9 @@ class HnetSpot extends EventEmitter {
                 break;
             case 'bye':
                 {
+                    if (msg.fields.from.type !== 'host') {
+                        return;
+                    }
                     delete this.hosts[msg.fields.from.uuid];
                     this.emit('bye', msg.fields);
                     if (this.logger) {
