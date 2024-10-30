@@ -473,7 +473,8 @@ class HnetSpot extends EventEmitter {
             from: { host: '', ...this.options }
         };
         if (alive) {
-            req.channels = this.channels;
+            const channels = this.channels.map(e => ({ id: e.id, name: e.name }));
+            req.channels = channels;
         }
         const msg = new HnetMessage(alive ? 'alive' : 'bye', req);
         this.broadcast(msg);

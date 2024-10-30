@@ -126,7 +126,9 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
       from: { host: '', ...this.options }
     };
     if (alive) {
-      (req as any as HnetCommandMap['alive']['req']).channels = this.channels;
+      const channels = this.channels.map(e => ({ id: e.id, name: e.name }));
+
+      (req as any as HnetCommandMap['alive']['req']).channels = channels;
     }
     const msg = new HnetMessage<'alive' | 'bye'>(alive ? 'alive' : 'bye', req);
 
