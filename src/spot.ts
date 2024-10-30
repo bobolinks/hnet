@@ -110,6 +110,16 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
     this.datso.send(buf, 0, buf.length, { address: target.host, port: target.port });
   }
 
+  sendData(data: string | Uint8Array, target: Pick<HnetAddress, 'host' | 'port'>, chnn: number) {
+    const req: HnetCommandMap['data']['req'] = {
+      from: { host: '', ...this.options, },
+      data,
+      chnn,
+    };
+    const msg = new HnetMessage('data', req);
+    return this.send(msg, target);
+  }
+
   /** search points with type */
   search(type?: HnetPointType | '*'): void {
     const from: HnetCommandMap['search']['req'] = {

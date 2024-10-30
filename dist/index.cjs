@@ -459,6 +459,15 @@ class HnetSpot extends EventEmitter {
         const buf = message.toBuffer();
         this.datso.send(buf, 0, buf.length, { address: target.host, port: target.port });
     }
+    sendData(data, target, chnn) {
+        const req = {
+            from: { host: '', ...this.options, },
+            data,
+            chnn,
+        };
+        const msg = new HnetMessage('data', req);
+        return this.send(msg, target);
+    }
     /** search points with type */
     search(type) {
         const from = {

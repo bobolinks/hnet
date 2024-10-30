@@ -173,6 +173,9 @@ export declare class HnetSpot extends EventEmitter<HnetEventMap> {
   /** send message through data socket */
   send(message: HnetMessage<any, any>, target: Pick<HnetAddress, 'host' | 'port'>): void;
 
+  /** send data through data socket */
+  sendData(data: string | Uint8Array, target: Pick<HnetAddress, 'host' | 'port'>, chnn: number): void;
+
   /** search points with type */
   search(type?: HnetPointType | '*'): void;
 }
