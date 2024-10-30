@@ -107,7 +107,7 @@ declare interface HnetChannel {
 declare type HnetCommandMap = {
   search: {
     req: HnetFrom & { type: HnetPointType | '*'; };
-    rsp: HnetResponse;
+    rsp: HnetResponse & { channels: HnetChannel[]; };
   },
   alive: {
     req: HnetFrom & { channels: HnetChannel[]; };
@@ -147,6 +147,7 @@ declare type HnetEventMap = {
 };
 
 declare type HnetHost = HnetAddress & {
+  channels: HnetChannel[];
   active: number;
 };
 

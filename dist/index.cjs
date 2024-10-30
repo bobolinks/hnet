@@ -521,7 +521,7 @@ class HnetSpot extends EventEmitter {
                     if (msg.fields.from.type !== 'host') {
                         return;
                     }
-                    const host = { ...msg.fields.from, host: rinfo.address, active: Date.now() };
+                    const host = { ...msg.fields.from, host: rinfo.address, channels: msg.fields.channels, active: Date.now() };
                     this.hosts[host.uuid] = host;
                     this.emit('alive', msg.fields);
                     if (this.logger) {
@@ -565,9 +565,11 @@ class HnetSpot extends EventEmitter {
         if (this.logger) {
             this.logger.info(`Search message from ${msg.fields.from.host}:${msg.fields.from.port} [${msg.fields.from.name}]`);
         }
+        const channels = this.channels.map(e => ({ id: e.id, name: e.name }));
         const from = {
             from: { host: '', ...this.options },
             code: 0,
+            channels,
         };
         const rsp = new HnetMessage('search', from, true);
         this.send(rsp, msg.fields.from);

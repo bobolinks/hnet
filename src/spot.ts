@@ -3,7 +3,7 @@ import { HNET_BROADCAST_PORT, HNET_DATA_PORT } from './const';
 import { EventEmitter } from './events';
 import { HnetMessage, randomHex } from './message';
 import codec from './codec';
-import type { HnetAddress, HnetChannel, HnetChnnID, HnetCommandMap, HnetEventMap, HnetHost, HnetPointType, HnetResponse, Logger, Options, PUID, RemoteAddressInfo, UDPSocket } from '../types';
+import type { HnetAddress, HnetChannel, HnetChnnID, HnetCommandMap, HnetEventMap, HnetHost, HnetPointType, Logger, Options, PUID, RemoteAddressInfo, UDPSocket } from '../types';
 
 function genUUID() {
   return `${randomHex(8)}-${randomHex(4)}-${randomHex(4)}-${randomHex(4)}-${randomHex(12)}`;
@@ -180,7 +180,7 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
         if (msg.fields.from.type !== 'host') {
           return;
         }
-        const host: HnetHost = { ...msg.fields.from, host: rinfo.address, active: Date.now() };
+        const host: HnetHost = { ...msg.fields.from, host: rinfo.address, channels: (msg as HnetMessage<'alive'>).fields.channels, active: Date.now() };
         this.hosts[host.uuid] = host;
         this.emit('alive', msg.fields);
         if (this.logger) {
@@ -222,9 +222,11 @@ export class HnetSpot extends EventEmitter<HnetEventMap> {
     if (this.logger) {
       this.logger.info(`Search message from ${msg.fields.from.host}:${msg.fields.from.port} [${msg.fields.from.name}]`);
     }
-    const from: HnetResponse = {
+    const channels = this.channels.map(e => ({ id: e.id, name: e.name }));
+    const from: HnetCommandMap['search']['rsp'] = {
       from: { host: '', ...this.options },
       code: 0,
+      channels,
     };
     const rsp = new HnetMessage<'search', 'rsp'>('search', from, true);
 
