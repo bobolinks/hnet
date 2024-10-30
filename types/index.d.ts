@@ -1,7 +1,7 @@
 declare type FnEvtListener<TEventData> = (event: TEventData) => void;
 
 /* From threejs EventDispatcher */
-declare class EventEmitter<TEventMap extends {} = {}> {
+export declare class EventEmitter<TEventMap extends {} = {}> {
   /**
    * Adds a listener to an event type.
    * @param type The type of event to listen to.
@@ -140,7 +140,7 @@ declare type HnetEventMap = {
 /** without host */
 declare type Options = Omit<HnetAddress, 'host'>;
 
-declare class HnetSpot extends EventEmitter<HnetEventMap> {
+export declare class HnetSpot extends EventEmitter<HnetEventMap> {
   public readonly options: Required<Options>;
 
   constructor(sigso: UDPSocket, datso: UDPSocket, opts?: Partial<Options>, logger?: Logger);
