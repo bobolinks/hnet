@@ -1,4 +1,5 @@
 
+import type { Address, UDPSocketEventMap } from '../../types';
 import { EventEmitter } from '../events';
 
 export class UDPSocket extends EventEmitter<UDPSocketEventMap> {

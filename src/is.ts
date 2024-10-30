@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/consistent-type-assertions */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable @typescript-eslint/indent */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 /* --------------------------------------------------------------------------------------------
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.

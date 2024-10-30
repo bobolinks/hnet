@@ -3,6 +3,7 @@ import { HNET_BROADCAST_PORT, HNET_DATA_PORT } from './const';
 import { EventEmitter } from './events';
 import { HnetMessage, randomHex } from './message';
 import codec from './codec';
+import type { HnetAddress, HnetCommandMap, HnetEventMap, HnetFrom, HnetPointType, HnetResponse, Logger, Options, PUID, RemoteAddressInfo, UDPSocket } from '../types';
 
 function genUUID() {
   return `${randomHex(8)}-${randomHex(4)}-${randomHex(4)}-${randomHex(4)}-${randomHex(12)}`;

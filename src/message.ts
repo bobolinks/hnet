@@ -1,3 +1,4 @@
+import type { HnetCommandMap } from '../types';
 import codec from './codec';
 
 let autoIncID = Math.ceil(Math.random() * 100000);

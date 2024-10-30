@@ -1,5 +1,6 @@
 
 import dgram, { RemoteInfo } from 'dgram';
+import type { Address, UDPSocketEventMap } from '../../types';
 import { EventEmitter } from '../events';
 
 export class UDPSocket extends EventEmitter<UDPSocketEventMap> {
