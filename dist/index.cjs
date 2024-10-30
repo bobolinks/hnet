@@ -585,4 +585,5 @@ class HnetSpot extends EventEmitter {
 
 exports.EventEmitter = EventEmitter;
 exports.HnetSpot = HnetSpot;
+exports.codec = codec;
 //# sourceMappingURL=index.cjs.map

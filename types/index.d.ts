@@ -176,3 +176,19 @@ export declare class HnetSpot extends EventEmitter<HnetEventMap> {
   /** search points with type */
   search(type?: HnetPointType | '*'): void;
 }
+
+
+// codec
+
+declare type ValPrimeType = undefined | null | boolean | Uint8Array | number | bigint | string;
+declare type ValDict = Record<string, ValPrimeType>;
+declare type ValType = ValPrimeType | Array<ValPrimeType | ValDict> | Record<string, ValPrimeType | ValDict>;
+
+declare class ScalableArray {
+  final(): Uint8Array;
+}
+
+declare const codec: {
+  encode<T extends ValType>(object: T, out?: ScalableArray): ScalableArray;
+  decode<T extends ValType>(buffer: Uint8Array, cxt?: { pos: number }): T;
+};

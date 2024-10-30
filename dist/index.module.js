@@ -581,5 +581,5 @@ class HnetSpot extends EventEmitter {
     }
 }
 
-export { EventEmitter, HnetSpot };
+export { EventEmitter, HnetSpot, codec };
 //# sourceMappingURL=index.module.js.map
