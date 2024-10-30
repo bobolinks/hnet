@@ -3,15 +3,11 @@ import { HNET_BROADCAST_PORT, HNET_DATA_PORT } from './const';
 import { EventEmitter } from './events';
 import { HnetMessage, randomHex } from './message';
 import codec from './codec';
-import type { HnetAddress, HnetChannel, HnetChnnID, HnetCommandMap, HnetEventMap, HnetPointType, HnetResponse, Logger, Options, PUID, RemoteAddressInfo, UDPSocket } from '../types';
+import type { HnetAddress, HnetChannel, HnetChnnID, HnetCommandMap, HnetEventMap, HnetHost, HnetPointType, HnetResponse, Logger, Options, PUID, RemoteAddressInfo, UDPSocket } from '../types';
 
 function genUUID() {
   return `${randomHex(8)}-${randomHex(4)}-${randomHex(4)}-${randomHex(4)}-${randomHex(12)}`;
 }
-
-type HnetHost = HnetAddress & {
-  active: number;
-};
 
 export class HnetSpot extends EventEmitter<HnetEventMap> {
   public readonly options: Required<Options> = {

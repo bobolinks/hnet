@@ -146,11 +146,17 @@ declare type HnetEventMap = {
   data: HnetCommandMap['data']['req'];
 };
 
+declare type HnetHost = HnetAddress & {
+  active: number;
+};
+
 /** without host */
 declare type Options = Omit<HnetAddress, 'host'>;
 
 export declare class HnetSpot extends EventEmitter<HnetEventMap> {
   public readonly options: Required<Options>;
+  public readonly hosts: Record<PUID, HnetHost>;
+  protected readonly channels: HnetChannel[];
 
   constructor(sigso: UDPSocket, datso: UDPSocket, opts?: Partial<Options>, logger?: Logger);
 
