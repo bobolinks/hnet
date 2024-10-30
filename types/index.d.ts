@@ -158,7 +158,7 @@ export declare class HnetSpot extends EventEmitter<HnetEventMap> {
   public readonly hosts: Record<PUID, HnetHost>;
   protected readonly channels: HnetChannel[];
 
-  constructor(sigso: UDPSocket, datso: UDPSocket, opts?: Partial<Options>, logger?: Logger);
+  constructor(sigso: UDPSocket, datso: UDPSocket, opts?: Partial<Options>, sigport?: number, logger?: Logger);
 
   /** start */
   start(): boolean;
